@@ -6,6 +6,42 @@ const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
+const queue = [];
+let isProcessing = false;
+const COOLDOWN_MS = 5000;
+
+function processQueue() {
+  if (isProcessing || queue.length === 0) return;
+  isProcessing = true;
+  const { url, hours, resolve, reject } = queue.shift();
+  scrapeZypage(url, hours)
+    .then((data) => {
+      resolve(data);
+      setTimeout(() => {
+        isProcessing = false;
+        processQueue();
+      }, COOLDOWN_MS);
+    })
+    .catch((err) => {
+      reject(err);
+      setTimeout(() => {
+        isProcessing = false;
+        processQueue();
+      }, COOLDOWN_MS);
+    });
+}
+
+function enqueue(url, hours) {
+  return new Promise((resolve, reject) => {
+    queue.push({ url, hours, resolve, reject });
+    processQueue();
+  });
+}
+
+app.get("/api/queue-status", (req, res) => {
+  res.json({ queueLength: queue.length, isProcessing });
+});
+
 function parseAmount(str) {
   return parseInt(str.replace(/[^\d]/g, ""), 10) || 0;
 }
@@ -124,8 +160,9 @@ app.post("/api/scrape", async (req, res) => {
     return res.status(400).json({ error: "Vui long nhap link ZyPage hop le" });
   }
   const h = Math.max(1, Math.min(720, parseInt(hours, 10) || 24));
+  const position = queue.length + 1;
   try {
-    const data = await scrapeZypage(url, h);
+    const data = await enqueue(url, h);
     res.json(data);
   } catch (err) {
     res.status(500).json({ error: "Loi khi cao du lieu: " + err.message });

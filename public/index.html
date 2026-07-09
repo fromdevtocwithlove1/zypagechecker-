@@ -205,7 +205,8 @@
     <div class="error" id="errorBox"></div>
     <div class="loading" id="loadingBox">
       <div class="spinner"></div>
-      <p>Dang cao du lieu... (co the mat 30-60 giay)</p>
+      <p id="loadingText">Dang cao du lieu... (co the mat 30-60 giay)</p>
+      <p id="queueText" style="color:#667eea;margin-top:8px;display:none;"></p>
     </div>
     <div class="result" id="resultBox">
       <div class="card">
@@ -251,6 +252,22 @@
       document.getElementById("loadingBox").className = "loading active";
       document.getElementById("searchBtn").disabled = true;
 
+      var queueInterval = setInterval(async function() {
+        try {
+          var qs = await fetch("/api/queue-status").then(function(r) { return r.json(); });
+          var qText = document.getElementById("queueText");
+          if (qs.queueLength > 0) {
+            qText.style.display = "block";
+            qText.textContent = "Hang cho: " + qs.queueLength + " nguoi dang doi phia truoc";
+          } else if (qs.isProcessing) {
+            qText.style.display = "block";
+            qText.textContent = "Dang xu ly yeu cau cua ban...";
+          } else {
+            qText.style.display = "none";
+          }
+        } catch(e) {}
+      }, 2000);
+
       try {
         var res = await fetch("/api/scrape", {
           method: "POST",
@@ -264,6 +281,8 @@
         document.getElementById("errorBox").textContent = err.message;
         document.getElementById("errorBox").className = "error active";
       } finally {
+        clearInterval(queueInterval);
+        document.getElementById("queueText").style.display = "none";
         document.getElementById("loadingBox").className = "loading";
         document.getElementById("searchBtn").disabled = false;
       }
