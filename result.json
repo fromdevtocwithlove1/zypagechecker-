@@ -1,0 +1,453 @@
+{
+  "streamer": "SBCB 5van",
+  "url": "https://zypage.com/sbcb5van",
+  "thoiGianCao": "20:25:15 6/7/2026",
+  "bangXepHang": {
+    "ngay": {
+      "topDonators": [
+        {
+          "name": "diuminh",
+          "amount": 1000000
+        },
+        {
+          "name": "Thắng bên Đức",
+          "amount": 219000
+        },
+        {
+          "name": "Nguyen The Du",
+          "amount": 100000
+        },
+        {
+          "name": "Phamtuanzza",
+          "amount": 100000
+        },
+        {
+          "name": "manhmessi",
+          "amount": 79000
+        },
+        {
+          "name": "Tể tướng wjbu tộc",
+          "amount": 50000
+        },
+        {
+          "name": "Tú sena phải chết trong tù",
+          "amount": 46000
+        },
+        {
+          "name": "Độ lồn",
+          "amount": 40000
+        },
+        {
+          "name": "hehe",
+          "amount": 30000
+        },
+        {
+          "name": "em đức ptit thích mấy chị khóa trên",
+          "amount": 30000
+        }
+      ],
+      "tongTop": 1694000,
+      "tongTopFormatted": "1.694.000đ"
+    },
+    "thang": {
+      "topDonators": [
+        {
+          "name": "xuan bac",
+          "amount": 2617000
+        },
+        {
+          "name": "diuminh",
+          "amount": 2099000
+        },
+        {
+          "name": "Nguyen Minh Quân Béo AKA Nothing",
+          "amount": 1242000
+        },
+        {
+          "name": "Gà Trống Hoa Mơ",
+          "amount": 819000
+        },
+        {
+          "name": "Lê Chill",
+          "amount": 699000
+        },
+        {
+          "name": "Vh",
+          "amount": 619000
+        },
+        {
+          "name": "hehe",
+          "amount": 408000
+        },
+        {
+          "name": "Hlee",
+          "amount": 378000
+        },
+        {
+          "name": "kvi",
+          "amount": 367000
+        },
+        {
+          "name": "manhmessi",
+          "amount": 338000
+        }
+      ],
+      "tongTop": 9586000,
+      "tongTopFormatted": "9.586.000đ"
+    },
+    "tong": {
+      "topDonators": [
+        {
+          "name": "Nguyen Minh Quân Béo AKA Nothing",
+          "amount": 55027000
+        },
+        {
+          "name": "Giả Bảo Ngọc",
+          "amount": 36212000
+        },
+        {
+          "name": "Dangcachep",
+          "amount": 29018000
+        },
+        {
+          "name": "F I L C O thống đốc ngân hàng địa phủ",
+          "amount": 26961000
+        },
+        {
+          "name": "kai havertzchita",
+          "amount": 24922000
+        },
+        {
+          "name": "DoiBu0n",
+          "amount": 23536000
+        },
+        {
+          "name": "thaitudanang",
+          "amount": 17413000
+        },
+        {
+          "name": "Sisyphus Prime",
+          "amount": 15148000
+        },
+        {
+          "name": "Em hùng thanh hoá",
+          "amount": 13811000
+        },
+        {
+          "name": "Trung Đỗ Minh",
+          "amount": 13186000
+        }
+      ],
+      "tongTop": 255234000,
+      "tongTopFormatted": "255.234.000đ"
+    }
+  },
+  "donateGanDay": {
+    "soLuong": 60,
+    "tongTien": 1074363,
+    "tongTienFormatted": "1.074.363đ",
+    "trungBinhMoiDonate": "17.906đ",
+    "chiTiet": [
+      {
+        "nguoiGui": "nguyễn kỳ phong",
+        "thoiGian": "11 giờ trước",
+        "soTien": 10000
+      },
+      {
+        "nguoiGui": "Tú sena phải chết trong tù",
+        "thoiGian": "11 giờ trước",
+        "soTien": 36363
+      },
+      {
+        "nguoiGui": "GumzieNino đã donate 200000 đồng cho bạn",
+        "thoiGian": "11 giờ trước",
+        "soTien": 10000
+      },
+      {
+        "nguoiGui": "Minh Germany",
+        "thoiGian": "11 giờ trước",
+        "soTien": 10000
+      },
+      {
+        "nguoiGui": "Lê bách",
+        "thoiGian": "11 giờ trước",
+        "soTien": 10000
+      },
+      {
+        "nguoiGui": "Độ lồn",
+        "thoiGian": "11 giờ trước",
+        "soTien": 10000
+      },
+      {
+        "nguoiGui": "GumzieNino đã donate 200000 đồng cho bạn",
+        "thoiGian": "11 giờ trước",
+        "soTien": 10000
+      },
+      {
+        "nguoiGui": "Em hùng thanh hoá",
+        "thoiGian": "12 giờ trước",
+        "soTien": 20000
+      },
+      {
+        "nguoiGui": "nguyễn kỳ phong",
+        "thoiGian": "12 giờ trước",
+        "soTien": 10000
+      },
+      {
+        "nguoiGui": "Độ lồn",
+        "thoiGian": "12 giờ trước",
+        "soTien": 10000
+      },
+      {
+        "nguoiGui": "5x ăn cứt",
+        "thoiGian": "12 giờ trước",
+        "soTien": 10000
+      },
+      {
+        "nguoiGui": "Độ lồn",
+        "thoiGian": "12 giờ trước",
+        "soTien": 10000
+      },
+      {
+        "nguoiGui": "Donio jr",
+        "thoiGian": "12 giờ trước",
+        "soTien": 10000
+      },
+      {
+        "nguoiGui": "5chó",
+        "thoiGian": "12 giờ trước",
+        "soTien": 10000
+      },
+      {
+        "nguoiGui": "Độ lồn",
+        "thoiGian": "12 giờ trước",
+        "soTien": 10000
+      },
+      {
+        "nguoiGui": "DuyToxic",
+        "thoiGian": "12 giờ trước",
+        "soTien": 10000
+      },
+      {
+        "nguoiGui": "Phát Tôn",
+        "thoiGian": "12 giờ trước",
+        "soTien": 10000
+      },
+      {
+        "nguoiGui": "Hlee",
+        "thoiGian": "12 giờ trước",
+        "soTien": 10000
+      },
+      {
+        "nguoiGui": "em đức ptit thích mấy chị khóa trên",
+        "thoiGian": "12 giờ trước",
+        "soTien": 10000
+      },
+      {
+        "nguoiGui": "Hlee",
+        "thoiGian": "12 giờ trước",
+        "soTien": 10000
+      },
+      {
+        "nguoiGui": "mờ phạm béo ghét thằng 5 van",
+        "thoiGian": "12 giờ trước",
+        "soTien": 10000
+      },
+      {
+        "nguoiGui": "em đức ptit thích mấy chị khóa trên",
+        "thoiGian": "12 giờ trước",
+        "soTien": 10000
+      },
+      {
+        "nguoiGui": "citi group",
+        "thoiGian": "12 giờ trước",
+        "soTien": 10000
+      },
+      {
+        "nguoiGui": "mờ phạm béo ghét thằng 5 van",
+        "thoiGian": "12 giờ trước",
+        "soTien": 10000
+      },
+      {
+        "nguoiGui": "Tuấn Đậm Sâu",
+        "thoiGian": "12 giờ trước",
+        "soTien": 10000
+      },
+      {
+        "nguoiGui": "Donio jr",
+        "thoiGian": "12 giờ trước",
+        "soTien": 10000
+      },
+      {
+        "nguoiGui": "5chó",
+        "thoiGian": "12 giờ trước",
+        "soTien": 10000
+      },
+      {
+        "nguoiGui": "Tú sena phải chết trong tù",
+        "thoiGian": "12 giờ trước",
+        "soTien": 10000
+      },
+      {
+        "nguoiGui": "Sugu",
+        "thoiGian": "12 giờ trước",
+        "soTien": 10000
+      },
+      {
+        "nguoiGui": "Ben",
+        "thoiGian": "12 giờ trước",
+        "soTien": 10000
+      },
+      {
+        "nguoiGui": "Tuấn Đậm Sâu",
+        "thoiGian": "13 giờ trước",
+        "soTien": 10000
+      },
+      {
+        "nguoiGui": "luytinhquynhpham",
+        "thoiGian": "13 giờ trước",
+        "soTien": 10000
+      },
+      {
+        "nguoiGui": "Nguyen The Du",
+        "thoiGian": "13 giờ trước",
+        "soTien": 100000
+      },
+      {
+        "nguoiGui": "hehe",
+        "thoiGian": "13 giờ trước",
+        "soTien": 10000
+      },
+      {
+        "nguoiGui": "HEVRT",
+        "thoiGian": "13 giờ trước",
+        "soTien": 10000
+      },
+      {
+        "nguoiGui": "GumzieNino đã donate 200000 đồng cho bạn",
+        "thoiGian": "13 giờ trước",
+        "soTien": 10000
+      },
+      {
+        "nguoiGui": "em đức ptit thích mấy chị khóa trên",
+        "thoiGian": "13 giờ trước",
+        "soTien": 10000
+      },
+      {
+        "nguoiGui": "Minh Dwcks",
+        "thoiGian": "13 giờ trước",
+        "soTien": 10000
+      },
+      {
+        "nguoiGui": "Ben",
+        "thoiGian": "13 giờ trước",
+        "soTien": 10000
+      },
+      {
+        "nguoiGui": "myon",
+        "thoiGian": "13 giờ trước",
+        "soTien": 10000
+      },
+      {
+        "nguoiGui": "hehe",
+        "thoiGian": "13 giờ trước",
+        "soTien": 10000
+      },
+      {
+        "nguoiGui": "Sugu",
+        "thoiGian": "13 giờ trước",
+        "soTien": 10000
+      },
+      {
+        "nguoiGui": "hehe",
+        "thoiGian": "13 giờ trước",
+        "soTien": 10000
+      },
+      {
+        "nguoiGui": "Sugu",
+        "thoiGian": "13 giờ trước",
+        "soTien": 10000
+      },
+      {
+        "nguoiGui": "Thắng bên Đức",
+        "thoiGian": "18 giờ trước",
+        "soTien": 50000
+      },
+      {
+        "nguoiGui": "Long Trần",
+        "thoiGian": "18 giờ trước",
+        "soTien": 10000
+      },
+      {
+        "nguoiGui": "Thắng bên Đức",
+        "thoiGian": "18 giờ trước",
+        "soTien": 69000
+      },
+      {
+        "nguoiGui": "Tể tướng wjbu tộc",
+        "thoiGian": "18 giờ trước",
+        "soTien": 10000
+      },
+      {
+        "nguoiGui": "manhmessi",
+        "thoiGian": "18 giờ trước",
+        "soTien": 79000
+      },
+      {
+        "nguoiGui": "dsdw",
+        "thoiGian": "18 giờ trước",
+        "soTien": 10000
+      },
+      {
+        "nguoiGui": "Phamtuanzza",
+        "thoiGian": "18 giờ trước",
+        "soTien": 100000
+      },
+      {
+        "nguoiGui": "Thắng bên Đức",
+        "thoiGian": "18 giờ trước",
+        "soTien": 100000
+      },
+      {
+        "nguoiGui": "tokii",
+        "thoiGian": "19 giờ trước",
+        "soTien": 10000
+      },
+      {
+        "nguoiGui": "Tể tướng wjbu tộc",
+        "thoiGian": "19 giờ trước",
+        "soTien": 10000
+      },
+      {
+        "nguoiGui": "quanh1",
+        "thoiGian": "19 giờ trước",
+        "soTien": 10000
+      },
+      {
+        "nguoiGui": "Tể tướng wjbu tộc",
+        "thoiGian": "19 giờ trước",
+        "soTien": 10000
+      },
+      {
+        "nguoiGui": "Tể tướng wjbu tộc",
+        "thoiGian": "19 giờ trước",
+        "soTien": 10000
+      },
+      {
+        "nguoiGui": "Tể tướng wjbu tộc",
+        "thoiGian": "19 giờ trước",
+        "soTien": 10000
+      },
+      {
+        "nguoiGui": "Dế Nhỏ hihi",
+        "thoiGian": "19 giờ trước",
+        "soTien": 10000
+      },
+      {
+        "nguoiGui": "OLD DOG",
+        "thoiGian": "19 giờ trước",
+        "soTien": 10000
+      }
+    ]
+  }
+}

@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZyPage Donate Tracker</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0f0f1a;
+      color: #e0e0e0;
+      min-height: 100vh;
+    }
+    .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+    h1 {
+      text-align: center;
+      font-size: 28px;
+      margin: 30px 0;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .search-box {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+    }
+    .search-box input[type="text"] {
+      flex: 1;
+      min-width: 200px;
+      padding: 14px 18px;
+      border: 2px solid #2a2a40;
+      border-radius: 12px;
+      background: #1a1a2e;
+      color: #fff;
+      font-size: 16px;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+    .search-box input[type="text"]:focus { border-color: #667eea; }
+    .search-box input[type="text"]::placeholder { color: #555; }
+    .hours-input {
+      width: 100px;
+      padding: 14px 12px;
+      border: 2px solid #2a2a40;
+      border-radius: 12px;
+      background: #1a1a2e;
+      color: #fff;
+      font-size: 16px;
+      outline: none;
+      text-align: center;
+      transition: border-color 0.3s;
+    }
+    .hours-input:focus { border-color: #667eea; }
+    .hours-input::placeholder { color: #555; }
+    .search-box button {
+      padding: 14px 28px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.3s;
+      white-space: nowrap;
+    }
+    .search-box button:hover { opacity: 0.9; }
+    .search-box button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .loading {
+      text-align: center;
+      padding: 60px 0;
+      display: none;
+    }
+    .loading.active { display: block; }
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid #2a2a40;
+      border-top: 4px solid #667eea;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 20px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading p { color: #888; font-size: 14px; }
+    .error {
+      background: #2d1b1b;
+      border: 1px solid #5c2a2a;
+      color: #ff6b6b;
+      padding: 16px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      display: none;
+    }
+    .error.active { display: block; }
+    .result { display: none; }
+    .result.active { display: block; }
+    .card {
+      background: #1a1a2e;
+      border: 1px solid #2a2a40;
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+    .card-title {
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #888;
+      margin-bottom: 16px;
+    }
+    .streamer-name {
+      font-size: 22px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+    .streamer-time { font-size: 13px; color: #666; }
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .stat-item {
+      background: #16162b;
+      border: 1px solid #2a2a40;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+    }
+    .stat-value {
+      font-size: 24px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 6px;
+    }
+    .stat-label { font-size: 12px; color: #888; text-transform: uppercase; }
+    .ranking-item {
+      display: flex;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid #1f1f35;
+    }
+    .ranking-item:last-child { border-bottom: none; }
+    .rank-num {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 14px;
+      margin-right: 14px;
+      flex-shrink: 0;
+    }
+    .rank-1 { background: linear-gradient(135deg, #f7971e, #ffd200); color: #000; }
+    .rank-2 { background: linear-gradient(135deg, #bdc3c7, #ecf0f1); color: #000; }
+    .rank-3 { background: linear-gradient(135deg, #cd7f32, #e8a849); color: #000; }
+    .rank-other { background: #2a2a40; color: #888; }
+    .rank-name { flex: 1; font-size: 14px; }
+    .rank-amount { font-weight: 600; color: #667eea; font-size: 14px; }
+    .donate-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      background: #16162b;
+      border-radius: 10px;
+      margin-bottom: 8px;
+    }
+    .donate-left { flex: 1; }
+    .donate-name { font-size: 14px; font-weight: 500; }
+    .donate-time { font-size: 12px; color: #666; margin-top: 2px; }
+    .donate-amount {
+      font-weight: 700;
+      color: #4ecdc4;
+      font-size: 15px;
+      white-space: nowrap;
+      margin-left: 12px;
+    }
+    @media (max-width: 600px) {
+      .stat-grid { grid-template-columns: 1fr; }
+      .search-box { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>ZyPage Donate Tracker</h1>
+    <div class="search-box">
+      <input type="text" id="urlInput" placeholder="Nhap link ZyPage (vd: https://zypage.com/sbcb5van)">
+      <input type="number" id="hoursInput" class="hours-input" min="1" max="720" value="24" placeholder="Gio">
+      <button id="searchBtn" onclick="doScrape()">Tra cuu</button>
+    </div>
+    <div class="error" id="errorBox"></div>
+    <div class="loading" id="loadingBox">
+      <div class="spinner"></div>
+      <p>Dang cao du lieu... (co the mat 30-60 giay)</p>
+    </div>
+    <div class="result" id="resultBox">
+      <div class="card">
+        <div class="streamer-name" id="streamerName"></div>
+        <div class="streamer-time" id="streamerTime"></div>
+      </div>
+      <div class="stat-grid">
+        <div class="stat-item">
+          <div class="stat-value" id="statTotal"></div>
+          <div class="stat-label" id="statLabel">Tong donate 24h</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="statCount"></div>
+          <div class="stat-label">So luong donate</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="statAvg"></div>
+          <div class="stat-label">Trung binh / donate</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Bang xep hang ngay (Top donators)</div>
+        <div id="rankingList"></div>
+      </div>
+      <div class="card">
+        <div class="card-title" id="donateTitle">Chi tiet donate 24h gan day</div>
+        <div id="donateList"></div>
+      </div>
+    </div>
+  </div>
+  <script>
+    function formatVND(n) {
+      return n.toLocaleString("vi-VN") + "d";
+    }
+    async function doScrape() {
+      var url = document.getElementById("urlInput").value.trim();
+      var hours = parseInt(document.getElementById("hoursInput").value, 10) || 24;
+      if (!url) { alert("Vui long nhap link ZyPage"); return; }
+      if (!url.startsWith("http")) url = "https://" + url;
+
+      document.getElementById("errorBox").className = "error";
+      document.getElementById("resultBox").className = "result";
+      document.getElementById("loadingBox").className = "loading active";
+      document.getElementById("searchBtn").disabled = true;
+
+      try {
+        var res = await fetch("/api/scrape", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url: url, hours: hours }),
+        });
+        var data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Loi khong xac dinh");
+        renderResult(data);
+      } catch (err) {
+        document.getElementById("errorBox").textContent = err.message;
+        document.getElementById("errorBox").className = "error active";
+      } finally {
+        document.getElementById("loadingBox").className = "loading";
+        document.getElementById("searchBtn").disabled = false;
+      }
+    }
+    function renderResult(data) {
+      document.getElementById("streamerName").textContent = data.streamer;
+      document.getElementById("streamerTime").textContent = "Cap nhat: " + data.thoiGianCao;
+
+      var d = data.donateFiltered;
+      var h = data.hours || 24;
+      document.getElementById("statTotal").textContent = formatVND(d.tongTien);
+      document.getElementById("statLabel").textContent = "Tong donate " + h + "h";
+      document.getElementById("statCount").textContent = d.soLuong;
+      var avg = d.soLuong > 0 ? Math.round(d.tongTien / d.soLuong) : 0;
+      document.getElementById("statAvg").textContent = formatVND(avg);
+
+      var rankHtml = "";
+      var ranking = data.bangXepHangNgay.top;
+      if (ranking.length === 0) {
+        rankHtml = '<p style="color:#666;padding:10px 0;">Khong co du lieu</p>';
+      }
+      for (var i = 0; i < ranking.length; i++) {
+        var cls = i < 3 ? "rank-" + (i + 1) : "rank-other";
+        rankHtml += '<div class="ranking-item">' +
+          '<div class="rank-num ' + cls + '">' + (i + 1) + '</div>' +
+          '<div class="rank-name">' + escHtml(ranking[i].name) + '</div>' +
+          '<div class="rank-amount">' + formatVND(ranking[i].amount) + '</div>' +
+          '</div>';
+      }
+      document.getElementById("rankingList").innerHTML = rankHtml;
+
+      document.getElementById("donateTitle").textContent = "Chi tiet donate " + h + "h gan day";
+      var donateHtml = "";
+      var list = d.danhSach;
+      if (list.length === 0) {
+        donateHtml = '<p style="color:#666;padding:10px 0;">Khong co donate trong ' + h + 'h</p>';
+      }
+      for (var j = 0; j < list.length; j++) {
+        donateHtml += '<div class="donate-item">' +
+          '<div class="donate-left">' +
+          '<div class="donate-name">' + escHtml(list[j].nguoiGui) + '</div>' +
+          '<div class="donate-time">' + escHtml(list[j].thoiGian) + '</div>' +
+          '</div>' +
+          '<div class="donate-amount">+' + formatVND(list[j].soTien) + '</div>' +
+          '</div>';
+      }
+      document.getElementById("donateList").innerHTML = donateHtml;
+      document.getElementById("resultBox").className = "result active";
+    }
+    function escHtml(s) {
+      var d = document.createElement("div");
+      d.textContent = s;
+      return d.innerHTML;
+    }
+    document.getElementById("urlInput").addEventListener("keydown", function(e) {
+      if (e.key === "Enter") doScrape();
+    });
+  </script>
+</body>
+</html>
