@@ -56,43 +56,43 @@ function timeToHours(timeStr) {
 }
 
 async function scrapeZypage(url, hours = 24) {
-  const browser = await chromium.launch({ headless: true });
+  const browser = await chromium.launch({
+    headless: true,
+    args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage"],
+  });
   try {
-    const page = await browser.newPage();
-    await page.goto(url, { waitUntil: "networkidle", timeout: 30000 });
-    await page.waitForTimeout(5000);
+    const page = await browser.newPage({
+      locale: "vi-VN",
+      userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+    });
+    await page.goto(url, { waitUntil: "domcontentloaded", timeout: 30000 });
+    await page.waitForFunction(() => document.body.innerText.includes("GẦN ĐÂY") || document.body.innerText.includes("BẢNG XẾP HẠNG"), null, { timeout: 30000 });
+    await page.waitForTimeout(3000);
 
     const streamerName = await page.evaluate(() => {
-      const el = document.querySelector("h1, h2, .shop_name, [class*='name']");
-      return el?.innerText?.trim() || "Unknown";
+      const text = document.body.innerText;
+      const handle = location.pathname.split("/").filter(Boolean)[0];
+      const lines = text.split("\n").map((l) => l.trim()).filter(Boolean);
+      const handleIndex = lines.findIndex((l) => l === `@${handle}`);
+      if (handleIndex > 0) return lines[handleIndex - 1];
+      return document.title.replace(/\s+on\s+ZyPage$/i, "").trim() || "Unknown";
     });
 
-    const dayBtn = page.locator("button.top_wall_tab_btn", { hasText: "Ngày" });
-    const hasDayBtn = await dayBtn.count();
-    let dayRanking = [];
-    if (hasDayBtn > 0) {
-      await dayBtn.click();
-      await page.waitForTimeout(3000);
-      const dayText = await page.evaluate(() => {
-        const titles = document.querySelectorAll(".menu_title");
-        for (const t of titles) {
-          if (t.innerText.includes("BẢNG XẾP HẠNG")) return t.parentElement?.innerText || "";
-        }
-        return "";
-      });
-      const lines = dayText.split("\n").map((l) => l.trim()).filter(Boolean);
-      for (let i = 0; i < lines.length; i++) {
-        const am = lines[i].match(/^([\d,.]+)đ$/);
-        if (am && i > 0) {
-          let name = lines[i - 1];
-          if (name.match(/^#\d+$/)) name = lines[i - 2] || name;
-          dayRanking.push({ name, amount: parseAmount(am[1]) });
-        }
+    const allTextBeforeScroll = await page.evaluate(() => document.body.innerText);
+    const rankingText = allTextBeforeScroll.split("BẢNG XẾP HẠNG")[1]?.split("GẦN ĐÂY")[0] || "";
+    const rankingLines = rankingText.split("\n").map((l) => l.trim()).filter(Boolean).filter((l) => !["Ngày", "Tháng", "Tổng"].includes(l));
+    const dayRanking = [];
+    for (let i = 0; i < rankingLines.length; i++) {
+      const am = rankingLines[i].match(/^([\d,.]+)đ$/);
+      if (am && i > 0) {
+        let name = rankingLines[i - 1];
+        if (name.match(/^#\d+$/)) name = rankingLines[i - 2] || name;
+        dayRanking.push({ name, amount: parseAmount(am[1]) });
       }
     }
     const dayTotal = dayRanking.reduce((s, r) => s + r.amount, 0);
 
-    const recentSection = page.locator("text=GẦN ĐÂY").first();
+    const recentSection = page.getByText("GẦN ĐÂY").first();
     const hasRecent = await recentSection.count();
     if (hasRecent > 0) {
       await recentSection.scrollIntoViewIfNeeded();
@@ -111,19 +111,18 @@ async function scrapeZypage(url, hours = 24) {
     }
 
     const allText = await page.evaluate(() => document.body.innerText);
-    const recentParts = allText.split("GẦN ĐÂY");
-    const recentText = recentParts.length > 1 ? recentParts[1] : "";
+    const recentText = allText.split("GẦN ĐÂY").slice(1).join("GẦN ĐÂY");
 
-    const donateRegex = /(.+?)\n(\d+\s+(?:giờ|phút|giây|ngày|tuần|tháng|năm)\s+trước)\nDonate\s+([\d,.]+)đ(?:\s+với lời nhắn)?/g;
+    const donateRegex = /([^\n]+)\n(\d+\s+(?:giờ|phút|giây|ngày|tuần|tháng|năm)\s+trước)\nDonate\s+([\d,.]+)đ/g;
     let m;
     const allDonations = [];
     while ((m = donateRegex.exec(recentText)) !== null) {
-      const hours = timeToHours(m[2].trim());
+      const donationHours = timeToHours(m[2].trim());
       allDonations.push({
         nguoiGui: m[1].trim(),
         thoiGian: m[2].trim(),
         soTien: parseAmount(m[3]),
-        hours,
+        hours: donationHours,
       });
     }
 
