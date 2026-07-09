@@ -65,9 +65,12 @@ async function scrapeZypage(url, hours = 24) {
       locale: "vi-VN",
       userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
     });
-    await page.goto(url, { waitUntil: "domcontentloaded", timeout: 30000 });
-    await page.waitForFunction(() => document.body.innerText.includes("GẦN ĐÂY") || document.body.innerText.includes("BẢNG XẾP HẠNG"), null, { timeout: 30000 });
-    await page.waitForTimeout(3000);
+    await page.goto(url, { waitUntil: "domcontentloaded", timeout: 60000 });
+    for (let i = 0; i < 6; i++) {
+      const hasData = await page.evaluate(() => /GẦN ĐÂY|BẢNG XẾP HẠNG|Donate\s+[\d,.]+đ/.test(document.body.innerText));
+      if (hasData) break;
+      await page.waitForTimeout(5000);
+    }
 
     const streamerName = await page.evaluate(() => {
       const text = document.body.innerText;
@@ -92,12 +95,16 @@ async function scrapeZypage(url, hours = 24) {
     }
     const dayTotal = dayRanking.reduce((s, r) => s + r.amount, 0);
 
-    const recentSection = page.getByText("GẦN ĐÂY").first();
-    const hasRecent = await recentSection.count();
-    if (hasRecent > 0) {
-      await recentSection.scrollIntoViewIfNeeded();
-      await page.waitForTimeout(1000);
-    }
+    await page.evaluate(() => {
+      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+      while (walker.nextNode()) {
+        if (walker.currentNode.nodeValue.includes("GẦN ĐÂY")) {
+          walker.currentNode.parentElement?.scrollIntoView();
+          break;
+        }
+      }
+    });
+    await page.waitForTimeout(1000);
 
     let prevCount = 0;
     for (let i = 0; i < 30; i++) {
