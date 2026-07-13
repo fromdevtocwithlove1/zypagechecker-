@@ -238,19 +238,58 @@
     </div>
   </div>
   <script>
+    var cooldownSeconds = 300;
+    var cooldownUntil = parseInt(localStorage.getItem("cooldownUntil"), 10) || 0;
+    var cooldownInterval = null;
+    var isScraping = false;
+
     function formatVND(n) {
       return n.toLocaleString("vi-VN") + "d";
     }
+    function getCooldownRemaining() {
+      return Math.max(0, Math.ceil((cooldownUntil - Date.now()) / 1000));
+    }
+    function formatCountdown(seconds) {
+      var minutes = Math.floor(seconds / 60);
+      var secs = seconds % 60;
+      return minutes + ":" + (secs < 10 ? "0" : "") + secs;
+    }
+    function updateSearchButton() {
+      if (isScraping) return;
+      var btn = document.getElementById("searchBtn");
+      var remaining = getCooldownRemaining();
+      if (remaining <= 0) {
+        clearInterval(cooldownInterval);
+        cooldownInterval = null;
+        localStorage.removeItem("cooldownUntil");
+        btn.disabled = false;
+        btn.textContent = "Tra cuu";
+        return;
+      }
+      btn.disabled = true;
+      btn.textContent = "Doi " + formatCountdown(remaining);
+    }
+    function startCooldown(seconds) {
+      cooldownUntil = Date.now() + seconds * 1000;
+      localStorage.setItem("cooldownUntil", cooldownUntil);
+      if (cooldownInterval) clearInterval(cooldownInterval);
+      cooldownInterval = setInterval(updateSearchButton, 1000);
+      updateSearchButton();
+    }
     async function doScrape() {
+      if (isScraping) return;
+      if (getCooldownRemaining() > 0) { updateSearchButton(); return; }
       var url = document.getElementById("urlInput").value.trim();
       var hours = parseInt(document.getElementById("hoursInput").value, 10) || 24;
       if (!url) { alert("Vui long nhap link ZyPage"); return; }
       if (!url.startsWith("http")) url = "https://" + url;
 
+      isScraping = true;
       document.getElementById("errorBox").className = "error";
       document.getElementById("resultBox").className = "result";
       document.getElementById("loadingBox").className = "loading active";
       document.getElementById("searchBtn").disabled = true;
+      document.getElementById("searchBtn").textContent = "Dang tra cuu";
 
       var queueInterval = setInterval(async function() {
         try {
@@ -259,6 +298,9 @@
           if (qs.queueLength > 0) {
             qText.style.display = "block";
             qText.textContent = "Hang cho: " + qs.queueLength + " nguoi dang doi phia truoc";
+          } else if (qs.cooldownRemaining > 0) {
+            qText.style.display = "block";
+            qText.textContent = "Vui long doi " + formatCountdown(qs.cooldownRemaining) + " de tra cuu tiep";
           } else if (qs.isProcessing) {
             qText.style.display = "block";
             qText.textContent = "Dang xu ly yeu cau cua ban...";
@@ -277,14 +319,17 @@
         var data = await res.json();
         if (!res.ok) throw new Error(data.error || "Loi khong xac dinh");
         renderResult(data);
+        startCooldown(cooldownSeconds);
       } catch (err) {
         document.getElementById("errorBox").textContent = err.message;
         document.getElementById("errorBox").className = "error active";
+        updateSearchButton();
       } finally {
+        isScraping = false;
         clearInterval(queueInterval);
         document.getElementById("queueText").style.display = "none";
         document.getElementById("loadingBox").className = "loading";
-        document.getElementById("searchBtn").disabled = false;
+        updateSearchButton();
       }
     }
     function renderResult(data) {
@@ -340,6 +385,10 @@
     document.getElementById("urlInput").addEventListener("keydown", function(e) {
       if (e.key === "Enter") doScrape();
     });
+    if (getCooldownRemaining() > 0) {
+      cooldownInterval = setInterval(updateSearchButton, 1000);
+    }
+    updateSearchButton();
   </script>
 </body>
 </html>

@@ -11,7 +11,17 @@ app.use(express.static(path.join(__dirname, "public")));
 
 const queue = [];
 let isProcessing = false;
-const COOLDOWN_MS = 5000;
+let cooldownUntil = 0;
+const COOLDOWN_MS = 300000;
+
+function finishProcessing() {
+  cooldownUntil = Date.now() + COOLDOWN_MS;
+  setTimeout(() => {
+    isProcessing = false;
+    cooldownUntil = 0;
+    processQueue();
+  }, COOLDOWN_MS);
+}
 
 function processQueue() {
   if (isProcessing || queue.length === 0) return;
@@ -20,17 +30,11 @@ function processQueue() {
   scrapeZypage(url, hours)
     .then((data) => {
       resolve(data);
-      setTimeout(() => {
-        isProcessing = false;
-        processQueue();
-      }, COOLDOWN_MS);
+      finishProcessing();
     })
     .catch((err) => {
       reject(err);
-      setTimeout(() => {
-        isProcessing = false;
-        processQueue();
-      }, COOLDOWN_MS);
+      finishProcessing();
     });
 }
 
@@ -42,7 +46,7 @@ function enqueue(url, hours) {
 }
 
 app.get("/api/queue-status", (req, res) => {
-  res.json({ queueLength: queue.length, isProcessing });
+  res.json({ queueLength: queue.length, isProcessing, cooldownRemaining: Math.max(0, Math.ceil((cooldownUntil - Date.now()) / 1000)) });
 });
 
 function parseAmount(str) {
