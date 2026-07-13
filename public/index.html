@@ -3,355 +3,1376 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#080b16">
   <title>ZyPage Donate Tracker</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #070914;
+      --card: rgba(18, 24, 47, 0.72);
+      --border: rgba(255, 255, 255, 0.08);
+      --text: #f7f8ff;
+      --muted: #9ba5c4;
+      --primary: #8b5cf6;
+      --primary-2: #5b8cff;
+      --cyan: #35d6ff;
+      --green: #34d399;
+      --yellow: #fbbf24;
+      --red: #fb7185;
+      --shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+      --radius: 22px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #0f0f1a;
-      color: #e0e0e0;
       min-height: 100vh;
+      overflow-x: hidden;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 15% 10%, rgba(139, 92, 246, 0.18), transparent 28%),
+        radial-gradient(circle at 85% 0%, rgba(53, 214, 255, 0.13), transparent 26%),
+        radial-gradient(circle at 50% 90%, rgba(91, 140, 255, 0.12), transparent 30%),
+        var(--bg);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
-    .container { max-width: 800px; margin: 0 auto; padding: 20px; }
-    h1 {
-      text-align: center;
-      font-size: 28px;
-      margin: 30px 0;
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+
+    body::before {
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
+      background-size: 42px 42px;
+      content: "";
+      mask-image: linear-gradient(to bottom, black, transparent 90%);
+      opacity: 0.4;
+      pointer-events: none;
     }
-    .search-box {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 30px;
-      flex-wrap: wrap;
+
+    button,
+    input {
+      font: inherit;
     }
-    .search-box input[type="text"] {
-      flex: 1;
-      min-width: 200px;
-      padding: 14px 18px;
-      border: 2px solid #2a2a40;
-      border-radius: 12px;
-      background: #1a1a2e;
-      color: #fff;
-      font-size: 16px;
-      outline: none;
-      transition: border-color 0.3s;
-    }
-    .search-box input[type="text"]:focus { border-color: #667eea; }
-    .search-box input[type="text"]::placeholder { color: #555; }
-    .hours-input {
-      width: 100px;
-      padding: 14px 12px;
-      border: 2px solid #2a2a40;
-      border-radius: 12px;
-      background: #1a1a2e;
-      color: #fff;
-      font-size: 16px;
-      outline: none;
-      text-align: center;
-      transition: border-color 0.3s;
-    }
-    .hours-input:focus { border-color: #667eea; }
-    .hours-input::placeholder { color: #555; }
-    .search-box button {
-      padding: 14px 28px;
-      border: none;
-      border-radius: 12px;
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      color: #fff;
-      font-size: 16px;
-      font-weight: 600;
+
+    button {
       cursor: pointer;
-      transition: opacity 0.3s;
-      white-space: nowrap;
     }
-    .search-box button:hover { opacity: 0.9; }
-    .search-box button:disabled {
-      opacity: 0.5;
+
+    button:disabled {
       cursor: not-allowed;
     }
-    .loading {
-      text-align: center;
-      padding: 60px 0;
-      display: none;
+
+    .app {
+      width: min(1440px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 48px;
     }
-    .loading.active { display: block; }
+
+    .glass {
+      border: 1px solid var(--border);
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.025));
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+
+    .topbar {
+      position: sticky;
+      z-index: 20;
+      top: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 16px 18px;
+      border-radius: 20px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: max-content;
+    }
+
+    .logo {
+      display: grid;
+      width: 44px;
+      height: 44px;
+      place-items: center;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2) 55%, var(--cyan));
+      box-shadow: 0 12px 30px rgba(123, 92, 246, 0.35);
+      font-size: 20px;
+      font-weight: 900;
+      transform: rotate(-4deg);
+    }
+
+    .brand-text h1 {
+      font-size: 16px;
+      letter-spacing: 0.2px;
+    }
+
+    .brand-text p {
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .status-pill,
+    .icon-btn,
+    .primary-btn,
+    .period-badge {
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    .status-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 40px;
+      padding: 0 14px;
+      border-radius: 999px;
+      background: rgba(9, 13, 28, 0.65);
+      color: #cbd4ee;
+      font-size: 13px;
+    }
+
+    .pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.55);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      70% { box-shadow: 0 0 0 8px rgba(52, 211, 153, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0); }
+    }
+
+    .icon-btn {
+      display: grid;
+      width: 42px;
+      height: 42px;
+      place-items: center;
+      border-radius: 13px;
+      background: rgba(255, 255, 255, 0.045);
+      transition: 0.25s ease;
+    }
+
+    .icon-btn:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.09);
+      transform: translateY(-2px);
+    }
+
+    .icon-btn:disabled {
+      opacity: 0.65;
+    }
+
+    .icon-btn.refreshing svg {
+      animation: spin 0.8s linear infinite;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.45fr 0.8fr;
+      gap: 22px;
+      margin-top: 28px;
+    }
+
+    .hero-main,
+    .hero-side {
+      position: relative;
+      overflow: hidden;
+      border-radius: var(--radius);
+    }
+
+    .hero-main {
+      display: flex;
+      min-height: 350px;
+      flex-direction: column;
+      justify-content: center;
+      padding: 42px;
+    }
+
+    .hero-main::after {
+      position: absolute;
+      top: -100px;
+      right: -90px;
+      width: 340px;
+      height: 340px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(139, 92, 246, 0.42), rgba(91, 140, 255, 0.08) 55%, transparent 70%);
+      content: "";
+      filter: blur(4px);
+    }
+
+    .eyebrow {
+      position: relative;
+      z-index: 1;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      width: fit-content;
+      margin-bottom: 18px;
+      padding: 8px 12px;
+      border: 1px solid rgba(139, 92, 246, 0.28);
+      border-radius: 999px;
+      background: rgba(139, 92, 246, 0.11);
+      color: #d9ceff;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .hero h2 {
+      position: relative;
+      z-index: 1;
+      max-width: 720px;
+      font-size: clamp(34px, 5.5vw, 70px);
+      line-height: 0.98;
+      letter-spacing: -3.5px;
+    }
+
+    .gradient-text {
+      color: transparent;
+      background: linear-gradient(90deg, #fff, #c4b5fd 35%, #67e8f9 80%);
+      background-clip: text;
+      -webkit-background-clip: text;
+    }
+
+    .hero-copy {
+      position: relative;
+      z-index: 1;
+      max-width: 650px;
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    .search-box {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      gap: 10px;
+      width: 100%;
+      max-width: 780px;
+      margin-top: 28px;
+    }
+
+    .search-field,
+    .hours-field {
+      display: flex;
+      height: 54px;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: rgba(3, 6, 18, 0.64);
+      transition: 0.25s ease;
+    }
+
+    .search-field {
+      min-width: 0;
+      flex: 1;
+      padding: 0 16px;
+    }
+
+    .hours-field {
+      width: 118px;
+      flex: 0 0 auto;
+      padding: 0 14px;
+    }
+
+    .search-field:focus-within,
+    .hours-field:focus-within {
+      border-color: rgba(139, 92, 246, 0.65);
+      box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
+    }
+
+    .search-field svg,
+    .hours-field svg {
+      flex: 0 0 auto;
+      color: var(--muted);
+    }
+
+    .search-field input,
+    .hours-field input {
+      min-width: 0;
+      border: 0;
+      outline: 0;
+      color: var(--text);
+      background: transparent;
+    }
+
+    .search-field input {
+      width: 100%;
+    }
+
+    .hours-field input {
+      width: 46px;
+      text-align: center;
+    }
+
+    .hours-field span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .search-field input::placeholder,
+    .hours-field input::placeholder {
+      color: #697491;
+    }
+
+    .hours-field input::-webkit-inner-spin-button,
+    .hours-field input::-webkit-outer-spin-button {
+      margin: 0;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    .primary-btn {
+      position: relative;
+      min-width: 120px;
+      height: 54px;
+      padding: 0 20px;
+      border-color: transparent;
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      box-shadow: 0 14px 34px rgba(91, 92, 246, 0.3);
+      font-weight: 800;
+      transition: 0.25s ease;
+    }
+
+    .primary-btn:hover:not(:disabled) {
+      box-shadow: 0 18px 40px rgba(91, 92, 246, 0.42);
+      transform: translateY(-2px);
+    }
+
+    .primary-btn:disabled {
+      color: transparent;
+      opacity: 0.85;
+    }
+
+    .primary-btn:disabled::after {
+      position: absolute;
+      inset: 0;
+      width: 19px;
+      height: 19px;
+      margin: auto;
+      border: 2px solid rgba(255, 255, 255, 0.35);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      content: "";
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .hero-side {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 26px;
+      background:
+        linear-gradient(160deg, rgba(139, 92, 246, 0.14), rgba(53, 214, 255, 0.06)),
+        rgba(15, 20, 40, 0.72);
+    }
+
+    .hero-side-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .hero-side h3 {
+      color: #dbe2f8;
+      font-size: 14px;
+    }
+
+    .live {
+      color: var(--green);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.8px;
+    }
+
+    .big-number {
+      margin-top: 26px;
+      font-size: clamp(34px, 4vw, 58px);
+      font-weight: 900;
+      letter-spacing: -2px;
+      overflow-wrap: anywhere;
+    }
+
+    .big-number small {
+      color: var(--muted);
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+
+    .chart {
+      position: relative;
+      height: 110px;
+      margin: 22px -8px 0;
+    }
+
+    .chart svg {
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+
+    .chart-info {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .trend {
+      color: var(--green);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .updated {
+      color: var(--muted);
+      font-size: 11px;
+      text-align: right;
+    }
+
+    .feedback {
+      display: none;
+      margin-top: 22px;
+      padding: 18px 20px;
+      border-radius: 16px;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .feedback.active {
+      display: block;
+    }
+
+    .error {
+      border-color: rgba(251, 113, 133, 0.24);
+      background: rgba(159, 18, 57, 0.12);
+      color: #fecdd3;
+    }
+
+    .loading-box {
+      text-align: center;
+    }
+
     .spinner {
-      width: 50px;
-      height: 50px;
-      border: 4px solid #2a2a40;
-      border-top: 4px solid #667eea;
+      width: 42px;
+      height: 42px;
+      margin: 0 auto 14px;
+      border: 3px solid rgba(255, 255, 255, 0.1);
+      border-top-color: var(--primary);
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
-      margin: 0 auto 20px;
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .loading p { color: #888; font-size: 14px; }
-    .error {
-      background: #2d1b1b;
-      border: 1px solid #5c2a2a;
-      color: #ff6b6b;
-      padding: 16px;
-      border-radius: 12px;
-      margin-bottom: 20px;
+
+    .loading-box p {
+      color: #d8def0;
+      font-weight: 700;
+    }
+
+    .loading-box .queue-text {
+      display: none;
+      margin-top: 6px;
+      color: #b8a8ff;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .result {
       display: none;
     }
-    .error.active { display: block; }
-    .result { display: none; }
-    .result.active { display: block; }
-    .card {
-      background: #1a1a2e;
-      border: 1px solid #2a2a40;
-      border-radius: 16px;
-      padding: 24px;
-      margin-bottom: 20px;
+
+    .result.active {
+      display: block;
     }
-    .card-title {
-      font-size: 14px;
+
+    .result-intro {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      margin-top: 22px;
+      padding: 20px 22px;
+      border-radius: 20px;
+    }
+
+    .result-kicker {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.7px;
       text-transform: uppercase;
-      letter-spacing: 1px;
-      color: #888;
-      margin-bottom: 16px;
     }
+
     .streamer-name {
-      font-size: 22px;
-      font-weight: 700;
-      color: #fff;
-      margin-bottom: 4px;
+      margin-top: 5px;
+      font-size: 21px;
+      font-weight: 900;
     }
-    .streamer-time { font-size: 13px; color: #666; }
-    .stat-grid {
+
+    .streamer-time {
+      max-width: 940px;
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .period-badge {
+      min-width: max-content;
+      padding: 9px 12px;
+      border-radius: 999px;
+      background: rgba(139, 92, 246, 0.11);
+      color: #d9ceff;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .warning {
+      display: none;
+      margin-top: 12px;
+      padding: 13px 16px;
+      border: 1px solid rgba(251, 191, 36, 0.2);
+      border-radius: 14px;
+      background: rgba(251, 191, 36, 0.08);
+      color: #fde68a;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .warning.active {
+      display: block;
+    }
+
+    .stats-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
+      gap: 18px;
+      margin-top: 22px;
+    }
+
+    .stat-card {
+      padding: 22px;
+      border-radius: 20px;
+      transition: 0.25s ease;
+    }
+
+    .stat-card:hover {
+      border-color: rgba(255, 255, 255, 0.15);
+      transform: translateY(-4px);
+    }
+
+    .stat-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .stat-icon {
+      display: grid;
+      width: 38px;
+      height: 38px;
+      place-items: center;
+      border-radius: 12px;
+      background: rgba(139, 92, 246, 0.13);
+      color: #c8b7ff;
+    }
+
+    .stat-value {
+      margin-top: 20px;
+      font-size: clamp(24px, 3vw, 30px);
+      font-weight: 900;
+      letter-spacing: -1px;
+      overflow-wrap: anywhere;
+    }
+
+    .stat-note {
+      margin-top: 7px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: 0.85fr 1.55fr;
+      gap: 22px;
+      margin-top: 22px;
+    }
+
+    .panel {
+      min-width: 0;
+      padding: 24px;
+      border-radius: var(--radius);
+    }
+
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
       margin-bottom: 20px;
     }
-    .stat-item {
-      background: #16162b;
-      border: 1px solid #2a2a40;
-      border-radius: 12px;
-      padding: 20px;
+
+    .panel-title h3 {
+      font-size: 17px;
+    }
+
+    .panel-title p {
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .panel-label {
+      min-width: max-content;
+      padding: 7px 10px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.04);
+      color: #cdd5eb;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .ranking {
+      display: grid;
+      gap: 11px;
+    }
+
+    .rank-item {
+      display: grid;
+      grid-template-columns: 36px 42px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border: 1px solid transparent;
+      border-radius: 16px;
+      transition: 0.2s ease;
+    }
+
+    .rank-item:hover {
+      border-color: var(--border);
+      background: rgba(255, 255, 255, 0.045);
+    }
+
+    .rank-num {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 800;
       text-align: center;
     }
-    .stat-value {
-      font-size: 24px;
-      font-weight: 700;
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 6px;
+
+    .rank-item:nth-child(1) .rank-num { color: var(--yellow); }
+    .rank-item:nth-child(2) .rank-num { color: #d7deee; }
+    .rank-item:nth-child(3) .rank-num { color: #d69b70; }
+
+    .avatar {
+      display: grid;
+      width: 42px;
+      height: 42px;
+      place-items: center;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #7c3aed, #2563eb);
+      color: white;
+      font-size: 12px;
+      font-weight: 900;
     }
-    .stat-label { font-size: 12px; color: #888; text-transform: uppercase; }
-    .ranking-item {
+
+    .rank-item:nth-child(2) .avatar { background: linear-gradient(135deg, #0ea5e9, #14b8a6); }
+    .rank-item:nth-child(3) .avatar { background: linear-gradient(135deg, #f97316, #ec4899); }
+    .rank-item:nth-child(4) .avatar { background: linear-gradient(135deg, #22c55e, #0ea5e9); }
+    .rank-item:nth-child(5) .avatar { background: linear-gradient(135deg, #6366f1, #d946ef); }
+
+    .rank-name {
+      overflow: hidden;
+      font-size: 13px;
+      font-weight: 800;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .rank-meta {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .rank-money {
+      color: #ddd6fe;
+      font-size: 13px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .empty-inline {
+      padding: 36px 12px;
+      color: var(--muted);
+      font-size: 13px;
+      text-align: center;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+    }
+
+    table {
+      width: 100%;
+      min-width: 620px;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      padding: 15px 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.065);
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    th {
+      background: rgba(255, 255, 255, 0.025);
+      color: #8f9ab8;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.7px;
+      text-transform: uppercase;
+    }
+
+    td {
+      font-size: 13px;
+    }
+
+    tbody tr {
+      transition: 0.2s;
+    }
+
+    tbody tr:hover {
+      background: rgba(139, 92, 246, 0.06);
+    }
+
+    tbody tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .user-cell {
       display: flex;
       align-items: center;
-      padding: 12px 0;
-      border-bottom: 1px solid #1f1f35;
+      gap: 10px;
     }
-    .ranking-item:last-child { border-bottom: none; }
-    .rank-num {
+
+    .mini-avatar {
+      display: grid;
       width: 32px;
       height: 32px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 14px;
-      margin-right: 14px;
-      flex-shrink: 0;
-    }
-    .rank-1 { background: linear-gradient(135deg, #f7971e, #ffd200); color: #000; }
-    .rank-2 { background: linear-gradient(135deg, #bdc3c7, #ecf0f1); color: #000; }
-    .rank-3 { background: linear-gradient(135deg, #cd7f32, #e8a849); color: #000; }
-    .rank-other { background: #2a2a40; color: #888; }
-    .rank-name { flex: 1; font-size: 14px; }
-    .rank-amount { font-weight: 600; color: #667eea; font-size: 14px; }
-    .donate-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px 16px;
-      background: #16162b;
+      place-items: center;
       border-radius: 10px;
-      margin-bottom: 8px;
+      background: rgba(139, 92, 246, 0.16);
+      color: #d5c7ff;
+      font-size: 10px;
+      font-weight: 900;
     }
-    .donate-left { flex: 1; }
-    .donate-name { font-size: 14px; font-weight: 500; }
-    .donate-time { font-size: 12px; color: #666; margin-top: 2px; }
-    .donate-amount {
-      font-weight: 700;
-      color: #4ecdc4;
-      font-size: 15px;
-      white-space: nowrap;
-      margin-left: 12px;
+
+    .money {
+      color: #a7f3d0;
+      font-weight: 900;
     }
-    @media (max-width: 600px) {
-      .stat-grid { grid-template-columns: 1fr; }
-      .search-box { flex-direction: column; }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 9px;
+      border: 1px solid rgba(52, 211, 153, 0.2);
+      border-radius: 999px;
+      background: rgba(52, 211, 153, 0.08);
+      color: var(--green);
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    .empty-state {
+      display: none;
+      padding: 52px 20px;
+      color: var(--muted);
+      font-size: 13px;
+      text-align: center;
+    }
+
+    .footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-top: 22px;
+      padding: 18px 4px 0;
+      color: #707b98;
+      font-size: 11px;
+    }
+
+    .footer strong {
+      color: #a8b1ca;
+    }
+
+    @media (max-width: 1060px) {
+      .hero,
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .app {
+        width: min(calc(100% - 20px), 1440px);
+        padding-top: 10px;
+      }
+
+      .topbar {
+        top: 8px;
+        padding: 12px;
+      }
+
+      .brand-text p,
+      .status-pill {
+        display: none;
+      }
+
+      .hero {
+        margin-top: 18px;
+      }
+
+      .hero-main {
+        min-height: auto;
+        padding: 28px 20px;
+      }
+
+      .hero h2 {
+        letter-spacing: -2px;
+      }
+
+      .search-box {
+        flex-wrap: wrap;
+      }
+
+      .search-field {
+        flex-basis: 100%;
+      }
+
+      .hours-field {
+        width: calc(40% - 5px);
+      }
+
+      .primary-btn {
+        width: calc(60% - 5px);
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .result-intro {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .panel {
+        padding: 18px;
+      }
+
+      .rank-item {
+        grid-template-columns: 28px 38px minmax(0, 1fr);
+        gap: 9px;
+        padding: 10px 4px;
+      }
+
+      .avatar {
+        width: 38px;
+        height: 38px;
+      }
+
+      .rank-money {
+        grid-column: 3;
+      }
+
+      .footer {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .brand-text h1 {
+        font-size: 14px;
+      }
+
+      .logo {
+        width: 40px;
+        height: 40px;
+      }
+
+      .hero-side {
+        padding: 22px 18px;
+      }
+
+      .chart-info {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .updated {
+        text-align: left;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>ZyPage Donate Tracker</h1>
-    <div class="search-box">
-      <input type="text" id="urlInput" placeholder="Nhap link ZyPage (vd: https://zypage.com/sbcb5van)">
-      <input type="number" id="hoursInput" class="hours-input" min="1" max="720" value="24" placeholder="Gio">
-      <button id="searchBtn" onclick="doScrape()">Tra cuu</button>
-    </div>
-    <div class="error" id="errorBox"></div>
-    <div class="loading" id="loadingBox">
+  <main class="app">
+    <header class="topbar glass">
+      <div class="brand">
+        <div class="logo">Z</div>
+        <div class="brand-text">
+          <h1>ZyPage Donate Tracker</h1>
+          <p>Theo dõi donate theo thời gian thực</p>
+        </div>
+      </div>
+
+      <div class="top-actions">
+        <div class="status-pill" aria-live="polite">
+          <span class="pulse"></span>
+          <span id="statusText">Hệ thống sẵn sàng</span>
+        </div>
+        <button class="icon-btn" id="refreshBtn" type="button" aria-label="Làm mới dữ liệu" onclick="refreshData()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M20 11a8.1 8.1 0 0 0-15.5-2M4 4v5h5M4 13a8.1 8.1 0 0 0 15.5 2M20 20v-5h-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div class="hero-main glass">
+        <div class="eyebrow">
+          <span class="pulse"></span>
+          Donate analytics
+        </div>
+
+        <h2>
+          Tra cứu donate
+          <span class="gradient-text">nhanh &amp; trực quan.</span>
+        </h2>
+
+        <p class="hero-copy">
+          Dán đường dẫn trang ZyPage để kiểm tra tổng số tiền, số lượt donate, bảng xếp hạng ngày và các giao dịch trong khoảng thời gian bạn chọn.
+        </p>
+
+        <form class="search-box" id="searchForm">
+          <label class="search-field" aria-label="Đường dẫn ZyPage">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"></circle>
+              <path d="m20 20-3.5-3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path>
+            </svg>
+            <input id="urlInput" type="text" placeholder="zypage.com/ten-cua-ban" autocomplete="url">
+          </label>
+
+          <label class="hours-field" aria-label="Khoảng thời gian theo giờ">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.8"></circle>
+              <path d="M12 7v5l3 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+            <input id="hoursInput" type="number" min="1" max="720" value="24" placeholder="24">
+            <span>giờ</span>
+          </label>
+
+          <button class="primary-btn" id="searchBtn" type="submit">Tra cứu</button>
+        </form>
+      </div>
+
+      <aside class="hero-side glass">
+        <div>
+          <div class="hero-side-header">
+            <h3 id="heroPeriodLabel">Tổng donate 24 giờ</h3>
+            <span class="live">● LIVE</span>
+          </div>
+
+          <div class="big-number" id="totalDonate">
+            0 <small>VNĐ</small>
+          </div>
+
+          <div class="chart" aria-label="Biểu đồ minh họa donate">
+            <svg viewBox="0 0 520 130" preserveAspectRatio="none" aria-hidden="true">
+              <defs>
+                <linearGradient id="line" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stop-color="#8b5cf6"></stop>
+                  <stop offset="100%" stop-color="#35d6ff"></stop>
+                </linearGradient>
+                <linearGradient id="area" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#8b5cf6" stop-opacity=".35"></stop>
+                  <stop offset="100%" stop-color="#8b5cf6" stop-opacity="0"></stop>
+                </linearGradient>
+              </defs>
+              <path d="M0 105 C45 92, 62 104, 105 79 S180 101, 220 62 S290 79, 330 45 S405 67, 440 33 S488 40, 520 12 L520 130 L0 130 Z" fill="url(#area)"></path>
+              <path d="M0 105 C45 92, 62 104, 105 79 S180 101, 220 62 S290 79, 330 45 S405 67, 440 33 S488 40, 520 12" fill="none" stroke="url(#line)" stroke-width="4" stroke-linecap="round"></path>
+            </svg>
+          </div>
+        </div>
+
+        <div class="chart-info">
+          <span class="trend" id="trendText">Sẵn sàng tra cứu</span>
+          <span class="updated" id="updatedTime">Chưa có dữ liệu</span>
+        </div>
+      </aside>
+    </section>
+
+    <div class="feedback error glass" id="errorBox" role="alert"></div>
+
+    <div class="feedback loading-box glass" id="loadingBox" aria-live="polite">
       <div class="spinner"></div>
-      <p id="loadingText">Dang cao du lieu... (co the mat 30-60 giay)</p>
-      <p id="queueText" style="color:#667eea;margin-top:8px;display:none;"></p>
+      <p id="loadingText">Đang lấy dữ liệu từ ZyPage...</p>
+      <p class="queue-text" id="queueText"></p>
     </div>
-    <div class="result" id="resultBox">
-      <div class="card">
-        <div class="streamer-name" id="streamerName"></div>
-        <div class="streamer-time" id="streamerTime"></div>
-      </div>
-      <div class="stat-grid">
-        <div class="stat-item">
-          <div class="stat-value" id="statTotal"></div>
-          <div class="stat-label" id="statLabel">Tong donate 24h</div>
+
+    <section class="result" id="resultBox">
+      <div class="result-intro glass">
+        <div>
+          <div class="result-kicker">Kết quả tra cứu</div>
+          <div class="streamer-name" id="streamerName"></div>
+          <div class="streamer-time" id="streamerTime"></div>
         </div>
-        <div class="stat-item">
-          <div class="stat-value" id="statCount"></div>
-          <div class="stat-label">So luong donate</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-value" id="statAvg"></div>
-          <div class="stat-label">Trung binh / donate</div>
-        </div>
+        <span class="period-badge" id="resultPeriod">24 giờ gần nhất</span>
       </div>
-      <div class="card">
-        <div class="card-title">Bang xep hang ngay (Top donators)</div>
-        <div id="rankingList"></div>
+
+      <div class="warning" id="warningBox" role="status"></div>
+
+      <div class="stats-grid">
+        <article class="stat-card glass">
+          <div class="stat-top">
+            <span class="stat-label" id="statLabel">Tổng donate 24 giờ</span>
+            <span class="stat-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M4 7h16v11H4zM7 4h10v3H7z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"></path>
+                <path d="M15 12h5v3h-5a1.5 1.5 0 1 1 0-3Z" stroke="currentColor" stroke-width="1.7"></path>
+              </svg>
+            </span>
+          </div>
+          <div class="stat-value" id="statTotal">0đ</div>
+          <div class="stat-note" id="statTotalNote">Chưa có dữ liệu</div>
+        </article>
+
+        <article class="stat-card glass">
+          <div class="stat-top">
+            <span class="stat-label">Số lượng donate</span>
+            <span class="stat-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M12 21s-7-4.4-7-10a4 4 0 0 1 7-2.7A4 4 0 0 1 19 11c0 5.6-7 10-7 10Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"></path>
+              </svg>
+            </span>
+          </div>
+          <div class="stat-value" id="statCount">0</div>
+          <div class="stat-note" id="statCountNote">Chưa có giao dịch</div>
+        </article>
+
+        <article class="stat-card glass">
+          <div class="stat-top">
+            <span class="stat-label">Trung bình / donate</span>
+            <span class="stat-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M5 19V9m7 10V5m7 14v-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path>
+              </svg>
+            </span>
+          </div>
+          <div class="stat-value" id="statAvg">0đ</div>
+          <div class="stat-note" id="statAvgNote">Tính trên các giao dịch đã lọc</div>
+        </article>
       </div>
-      <div class="card">
-        <div class="card-title" id="donateTitle">Chi tiet donate 24h gan day</div>
-        <div id="donateList"></div>
+
+      <div class="content-grid">
+        <article class="panel glass">
+          <div class="panel-head">
+            <div class="panel-title">
+              <h3>Bảng xếp hạng ngày</h3>
+              <p>Top người donate nhiều nhất</p>
+            </div>
+            <span class="panel-label" id="rankingCount">0 người</span>
+          </div>
+          <div class="ranking" id="rankingList"></div>
+        </article>
+
+        <article class="panel glass">
+          <div class="panel-head">
+            <div class="panel-title">
+              <h3 id="donateTitle">Chi tiết donate gần đây</h3>
+              <p>Các giao dịch trong khoảng thời gian đã chọn</p>
+            </div>
+            <span class="panel-label" id="donateCount">0 giao dịch</span>
+          </div>
+
+          <div class="table-wrap">
+            <table id="donateTableElement">
+              <thead>
+                <tr>
+                  <th>Người donate</th>
+                  <th>Số tiền</th>
+                  <th>Thời gian</th>
+                  <th>Trạng thái</th>
+                </tr>
+              </thead>
+              <tbody id="donateList"></tbody>
+            </table>
+            <div class="empty-state" id="donateEmpty">Không có donate trong khoảng thời gian này.</div>
+          </div>
+        </article>
       </div>
-    </div>
-  </div>
+    </section>
+
+    <footer class="footer">
+      <span>© 2026 <strong>ZyPage Donate Tracker</strong></span>
+      <span>Dữ liệu trực tiếp từ ZyPage • Responsive • Không dùng framework</span>
+    </footer>
+  </main>
+
   <script>
     var isScraping = false;
+    var hasResult = false;
 
-    function formatVND(n) {
-      return n.toLocaleString("vi-VN") + "d";
+    function formatVND(value) {
+      var amount = Number(value);
+      if (!Number.isFinite(amount)) amount = 0;
+      return amount.toLocaleString("vi-VN") + "đ";
     }
+
+    function getInitials(value) {
+      var parts = String(value || "?").trim().split(/\s+/).filter(Boolean);
+      if (parts.length === 0) return "?";
+      if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+
     function updateSearchButton() {
-      var btn = document.getElementById("searchBtn");
-      btn.disabled = isScraping;
-      btn.textContent = isScraping ? "Dang tra cuu" : "Tra cuu";
+      var button = document.getElementById("searchBtn");
+      var refreshButton = document.getElementById("refreshBtn");
+      button.disabled = isScraping;
+      button.textContent = isScraping ? "Đang tra cứu" : "Tra cứu";
+      refreshButton.disabled = isScraping;
+      refreshButton.classList.toggle("refreshing", isScraping);
+      document.getElementById("statusText").textContent = isScraping
+        ? "Đang đồng bộ dữ liệu"
+        : hasResult ? "Dữ liệu đã cập nhật" : "Hệ thống sẵn sàng";
     }
+
+    function showError(message) {
+      var errorBox = document.getElementById("errorBox");
+      errorBox.textContent = message;
+      errorBox.className = "feedback error glass active";
+    }
+
+    function hideFeedback() {
+      document.getElementById("errorBox").className = "feedback error glass";
+      document.getElementById("loadingBox").className = "feedback loading-box glass";
+    }
+
     async function doScrape() {
       if (isScraping) return;
-      var url = document.getElementById("urlInput").value.trim();
-      var hours = parseInt(document.getElementById("hoursInput").value, 10) || 24;
-      if (!url) { alert("Vui long nhap link ZyPage"); return; }
+
+      var urlInput = document.getElementById("urlInput");
+      var hoursInput = document.getElementById("hoursInput");
+      var url = urlInput.value.trim();
+      var hours = parseInt(hoursInput.value, 10) || 24;
+      hours = Math.max(1, Math.min(720, hours));
+      hoursInput.value = hours;
+
+      if (!url) {
+        showError("Vui lòng nhập đường dẫn ZyPage.");
+        urlInput.focus();
+        return;
+      }
       if (!url.startsWith("http")) url = "https://" + url;
 
       isScraping = true;
-      document.getElementById("errorBox").className = "error";
+      hideFeedback();
       document.getElementById("resultBox").className = "result";
-      document.getElementById("loadingBox").className = "loading active";
-      document.getElementById("searchBtn").disabled = true;
-      document.getElementById("searchBtn").textContent = "Dang tra cuu";
+      document.getElementById("loadingBox").className = "feedback loading-box glass active";
+      document.getElementById("queueText").style.display = "none";
+      updateSearchButton();
 
       var queueInterval = setInterval(async function() {
         try {
-          var qs = await fetch("/api/queue-status").then(function(r) { return r.json(); });
-          var qText = document.getElementById("queueText");
-          if (qs.queueLength > 0) {
-            qText.style.display = "block";
-            qText.textContent = "Hang cho: " + qs.queueLength + " nguoi dang doi phia truoc";
-          } else if (qs.isProcessing) {
-            qText.style.display = "block";
-            qText.textContent = "Dang xu ly yeu cau cua ban...";
+          var response = await fetch("/api/queue-status");
+          var queueStatus = await response.json();
+          var queueText = document.getElementById("queueText");
+          if (queueStatus.queueLength > 0) {
+            queueText.style.display = "block";
+            queueText.textContent = "Hàng chờ: " + queueStatus.queueLength + " yêu cầu đang đợi";
+          } else if (queueStatus.isProcessing) {
+            queueText.style.display = "block";
+            queueText.textContent = "Đang xử lý yêu cầu của bạn...";
           } else {
-            qText.style.display = "none";
+            queueText.style.display = "none";
           }
-        } catch(e) {}
+        } catch (error) {}
       }, 2000);
 
       try {
-        var res = await fetch("/api/scrape", {
+        var response = await fetch("/api/scrape", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ url: url, hours: hours }),
         });
-        var data = await res.json();
-        if (!res.ok) throw new Error(data.error || "Loi khong xac dinh");
+        var data = await response.json();
+        if (!response.ok) throw new Error(data.error || "Không thể lấy dữ liệu từ ZyPage.");
+        hasResult = true;
         renderResult(data);
-      } catch (err) {
-        document.getElementById("errorBox").textContent = err.message;
-        document.getElementById("errorBox").className = "error active";
-        updateSearchButton();
+      } catch (error) {
+        showError(error.message);
       } finally {
         isScraping = false;
         clearInterval(queueInterval);
         document.getElementById("queueText").style.display = "none";
-        document.getElementById("loadingBox").className = "loading";
+        document.getElementById("loadingBox").className = "feedback loading-box glass";
         updateSearchButton();
       }
     }
-    function renderResult(data) {
-      document.getElementById("streamerName").textContent = data.streamer;
-      document.getElementById("streamerTime").textContent = "Cap nhat: " + data.thoiGianCao;
 
-      var d = data.donateFiltered;
-      var h = data.hours || 24;
-      document.getElementById("statTotal").textContent = formatVND(d.tongTien);
-      document.getElementById("statLabel").textContent = "Tong donate " + h + "h";
-      document.getElementById("statCount").textContent = d.soLuong;
-      var avg = d.soLuong > 0 ? Math.round(d.tongTien / d.soLuong) : 0;
-      document.getElementById("statAvg").textContent = formatVND(avg);
+    function renderResult(data) {
+      var hours = data.hours || 24;
+      var source = data.source === "api" ? "API ZyPage" : "DOM fallback";
+      var pagination = data.phanTrang || {};
+      var donations = data.donateFiltered || { soLuong: 0, tongTien: 0, danhSach: [] };
+      var rankingData = data.bangXepHangNgay || { top: [] };
+      var ranking = Array.isArray(rankingData.top) ? rankingData.top : [];
+      var list = Array.isArray(donations.danhSach) ? donations.danhSach : [];
+      var average = donations.soLuong > 0 ? Math.round(donations.tongTien / donations.soLuong) : 0;
+      var status = "Cập nhật " + data.thoiGianCao + " • Nguồn: " + source;
+
+      if (pagination.reachedCutoff) {
+        status += " • Đã quét qua mốc " + hours + " giờ";
+        if (pagination.pagesFetched) status += " (" + pagination.pagesFetched + " trang)";
+      }
+      if (pagination.cutoffTimestamp) {
+        status += " • Mốc lọc: " + new Date(pagination.cutoffTimestamp).toLocaleString("vi-VN");
+      }
+
+      document.getElementById("streamerName").textContent = data.streamer || "ZyPage";
+      document.getElementById("streamerTime").textContent = status;
+      document.getElementById("resultPeriod").textContent = hours + " giờ gần nhất";
+      document.getElementById("heroPeriodLabel").textContent = "Tổng donate " + hours + " giờ";
+      document.getElementById("totalDonate").innerHTML = donations.tongTien.toLocaleString("vi-VN") + " <small>VNĐ</small>";
+      document.getElementById("trendText").textContent = donations.soLuong + " giao dịch trong " + hours + " giờ";
+      document.getElementById("updatedTime").textContent = "Cập nhật " + data.thoiGianCao;
+
+      document.getElementById("statTotal").textContent = formatVND(donations.tongTien);
+      document.getElementById("statLabel").textContent = "Tổng donate " + hours + " giờ";
+      document.getElementById("statTotalNote").textContent = "Tổng từ " + donations.soLuong + " giao dịch đã lọc";
+      document.getElementById("statCount").textContent = Number(donations.soLuong || 0).toLocaleString("vi-VN");
+      document.getElementById("statCountNote").textContent = donations.soLuong > 0
+        ? "Khoảng " + (donations.soLuong / hours).toLocaleString("vi-VN", { maximumFractionDigits: 1 }) + " lượt mỗi giờ"
+        : "Chưa có giao dịch trong khoảng này";
+      document.getElementById("statAvg").textContent = formatVND(average);
+      document.getElementById("statAvgNote").textContent = "Trung bình trên mỗi lượt donate";
+
+      var warningBox = document.getElementById("warningBox");
+      if (data.partial) {
+        var warnings = Array.isArray(data.warnings) ? data.warnings.join("; ") : "Dữ liệu có thể chưa đầy đủ.";
+        warningBox.textContent = "Dữ liệu có thể chưa đầy đủ: " + warnings;
+        warningBox.className = "warning active";
+      } else {
+        warningBox.textContent = "";
+        warningBox.className = "warning";
+      }
 
       var rankHtml = "";
-      var ranking = data.bangXepHangNgay.top;
       if (ranking.length === 0) {
-        rankHtml = '<p style="color:#666;padding:10px 0;">Khong co du lieu</p>';
+        rankHtml = '<div class="empty-inline">Không có dữ liệu xếp hạng.</div>';
       }
       for (var i = 0; i < ranking.length; i++) {
-        var cls = i < 3 ? "rank-" + (i + 1) : "rank-other";
-        rankHtml += '<div class="ranking-item">' +
-          '<div class="rank-num ' + cls + '">' + (i + 1) + '</div>' +
-          '<div class="rank-name">' + escHtml(ranking[i].name) + '</div>' +
-          '<div class="rank-amount">' + formatVND(ranking[i].amount) + '</div>' +
+        rankHtml += '<div class="rank-item">' +
+          '<div class="rank-num">' + String(i + 1).padStart(2, "0") + '</div>' +
+          '<div class="avatar">' + escHtml(getInitials(ranking[i].name)) + '</div>' +
+          '<div><div class="rank-name">' + escHtml(ranking[i].name) + '</div>' +
+          '<div class="rank-meta">Xếp hạng #' + (i + 1) + ' trong ngày</div></div>' +
+          '<div class="rank-money">' + formatVND(ranking[i].amount) + '</div>' +
           '</div>';
       }
       document.getElementById("rankingList").innerHTML = rankHtml;
+      document.getElementById("rankingCount").textContent = ranking.length + " người";
 
-      document.getElementById("donateTitle").textContent = "Chi tiet donate " + h + "h gan day";
       var donateHtml = "";
-      var list = d.danhSach;
-      if (list.length === 0) {
-        donateHtml = '<p style="color:#666;padding:10px 0;">Khong co donate trong ' + h + 'h</p>';
-      }
       for (var j = 0; j < list.length; j++) {
-        donateHtml += '<div class="donate-item">' +
-          '<div class="donate-left">' +
-          '<div class="donate-name">' + escHtml(list[j].nguoiGui) + '</div>' +
-          '<div class="donate-time">' + escHtml(list[j].thoiGian) + '</div>' +
-          '</div>' +
-          '<div class="donate-amount">+' + formatVND(list[j].soTien) + '</div>' +
-          '</div>';
+        donateHtml += '<tr>' +
+          '<td><div class="user-cell"><span class="mini-avatar">' + escHtml(getInitials(list[j].nguoiGui)) + '</span><strong>' + escHtml(list[j].nguoiGui) + '</strong></div></td>' +
+          '<td class="money">+' + formatVND(list[j].soTien) + '</td>' +
+          '<td>' + escHtml(list[j].thoiGian) + '</td>' +
+          '<td><span class="badge">Thành công</span></td>' +
+          '</tr>';
       }
       document.getElementById("donateList").innerHTML = donateHtml;
+      document.getElementById("donateTitle").textContent = "Chi tiết donate " + hours + " giờ gần đây";
+      document.getElementById("donateCount").textContent = list.length + " giao dịch";
+      document.getElementById("donateTableElement").style.display = list.length ? "table" : "none";
+      document.getElementById("donateEmpty").style.display = list.length ? "none" : "block";
       document.getElementById("resultBox").className = "result active";
     }
-    function escHtml(s) {
-      var d = document.createElement("div");
-      d.textContent = s;
-      return d.innerHTML;
+
+    function escHtml(value) {
+      var element = document.createElement("div");
+      element.textContent = String(value == null ? "" : value);
+      return element.innerHTML;
     }
-    document.getElementById("urlInput").addEventListener("keydown", function(e) {
-      if (e.key === "Enter") doScrape();
+
+    function refreshData() {
+      if (isScraping) return;
+      if (!document.getElementById("urlInput").value.trim()) {
+        document.getElementById("urlInput").focus();
+        showError("Nhập đường dẫn ZyPage để làm mới dữ liệu.");
+        return;
+      }
+      doScrape();
+    }
+
+    document.getElementById("searchForm").addEventListener("submit", function(event) {
+      event.preventDefault();
+      doScrape();
     });
+
     updateSearchButton();
   </script>
 </body>

@@ -8,7 +8,7 @@
     "scrape": "node scraper.js",
     "dev": "node --watch server.js",
     "postinstall": "npx playwright install --with-deps chromium",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node --check server.js && node --check scraper.js && node -e \"const assert=require('node:assert/strict');const api=require('./server');assert.equal(api.normalizeZypageUrl('zypage.com/sbcb5van'),'https://zypage.com/sbcb5van');assert.throws(()=>api.normalizeZypageUrl('https://zypage.com.evil.test/x'));assert.throws(()=>api.normalizeZypageUrl('https://zypage.com/api/data'));assert.equal(api.parseAmount('10,000đ'),10000);assert.equal(api.parseZypageDate('2026-07-14 00:02:02').toISOString(),'2026-07-13T17:02:02.000Z');assert.equal(api.convertCurrencyAmount(2118.55,'vnd',{other:{usd:{exchange:1},vnd:{exchange:26126,decimals:0,round:1000}}}),55349000)\""
   },
   "keywords": [],
   "author": "",
