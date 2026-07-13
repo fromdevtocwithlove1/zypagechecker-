@@ -11,16 +11,9 @@ app.use(express.static(path.join(__dirname, "public")));
 
 const queue = [];
 let isProcessing = false;
-let cooldownUntil = 0;
-const COOLDOWN_MS = 300000;
-
 function finishProcessing() {
-  cooldownUntil = Date.now() + COOLDOWN_MS;
-  setTimeout(() => {
-    isProcessing = false;
-    cooldownUntil = 0;
-    processQueue();
-  }, COOLDOWN_MS);
+  isProcessing = false;
+  processQueue();
 }
 
 function processQueue() {
@@ -46,7 +39,7 @@ function enqueue(url, hours) {
 }
 
 app.get("/api/queue-status", (req, res) => {
-  res.json({ queueLength: queue.length, isProcessing, cooldownRemaining: Math.max(0, Math.ceil((cooldownUntil - Date.now()) / 1000)) });
+  res.json({ queueLength: queue.length, isProcessing, cooldownRemaining: 0 });
 });
 
 function parseAmount(str) {
