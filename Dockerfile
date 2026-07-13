@@ -38,7 +38,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Cai Node packages
-RUN npm ci --only=production
+RUN npm install --omit=dev
 
 # Cai Chromium cho Playwright
 RUN npx playwright install --with-deps chromium
