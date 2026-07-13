@@ -1,0 +1,38 @@
+# ====================================================
+# requirements.txt - ZyPage Streamer Scraper
+# ====================================================
+# Day la du an Node.js, khong phai Python.
+# File nay liet ke cac phu thuoc he thong va Node packages.
+# ====================================================
+
+# --- RUNTIME ---
+# Node.js >= 20.x
+# npm    >= 10.x
+
+# --- NODE PACKAGES (xem chi tiet trong package.json) ---
+# express     ^5.2.1   - Web server / API
+# playwright  ^1.61.1  - Headless browser scraping
+
+# --- HE THONG (can cho Playwright / Chromium) ---
+# wget
+# gnupg
+# Chromium (cai qua: npx playwright install --with-deps chromium)
+
+# ====================================================
+# HUONG DAN CAI DAT
+# ====================================================
+# 1. Cai Node.js (>= 20):
+#    https://nodejs.org/
+#
+# 2. Cai cac Node packages:
+#    npm install
+#
+# 3. Cai trinh duyet Chromium cho Playwright:
+#    npx playwright install --with-deps chromium
+#
+# 4. Chay scraper:
+#    npm run scrape
+#
+# 5. Chay web server:
+#    npm start
+# ====================================================
