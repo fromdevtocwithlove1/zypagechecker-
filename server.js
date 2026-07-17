@@ -5,9 +5,28 @@ const { chromium } = require("playwright");
 const path = require("path");
 
 const app = express();
+app.set("trust proxy", true);
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
+
+const COOLDOWN_MS = 10 * 60 * 1000; // 10 phút
+const cooldowns = new Map();
+
+function getClientIp(req) {
+  return req.ip || req.connection?.remoteAddress || "unknown";
+}
+
+function getCooldownRemaining(ip) {
+  const lastTime = cooldowns.get(ip);
+  if (!lastTime) return 0;
+  const elapsed = Date.now() - lastTime;
+  if (elapsed >= COOLDOWN_MS) {
+    cooldowns.delete(ip);
+    return 0;
+  }
+  return Math.ceil((COOLDOWN_MS - elapsed) / 1000);
+}
 
 const queue = [];
 let isProcessing = false;
@@ -40,7 +59,8 @@ function enqueue(url, hours) {
 }
 
 app.get("/api/queue-status", (req, res) => {
-  res.json({ queueLength: queue.length, isProcessing, cooldownRemaining: 0 });
+  const ip = getClientIp(req);
+  res.json({ queueLength: queue.length, isProcessing, cooldownRemaining: getCooldownRemaining(ip) });
 });
 
 function delay(ms) {
@@ -564,7 +584,21 @@ app.post("/api/scrape", async (req, res) => {
   } catch (error) {
     return res.status(400).json({ error: error.message });
   }
+
+  const ip = getClientIp(req);
+  const remaining = getCooldownRemaining(ip);
+  if (remaining > 0) {
+    const minutes = Math.floor(remaining / 60);
+    const seconds = remaining % 60;
+    const timeStr = minutes > 0 ? `${minutes} phút ${seconds} giây` : `${seconds} giây`;
+    return res.status(429).json({
+      error: `Vui lòng chờ ${timeStr} trước khi tra cứu tiếp.`,
+      cooldownRemaining: remaining,
+    });
+  }
+
   const hours = Math.max(1, Math.min(720, parseInt(req.body?.hours, 10) || 24));
+  cooldowns.set(ip, Date.now());
   try {
     const data = await enqueue(url, hours);
     res.json(data);
@@ -572,6 +606,14 @@ app.post("/api/scrape", async (req, res) => {
     res.status(500).json({ error: `Loi khi cao du lieu: ${err.message}` });
   }
 });
+
+// Dọn dẹp cooldown map mỗi 10 phút để tránh memory leak
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, timestamp] of cooldowns) {
+    if (now - timestamp >= COOLDOWN_MS) cooldowns.delete(ip);
+  }
+}, COOLDOWN_MS);
 
 function startServer() {
   const port = process.env.PORT || 3000;

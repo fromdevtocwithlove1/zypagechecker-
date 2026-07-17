@@ -1173,6 +1173,49 @@
   <script>
     var isScraping = false;
     var hasResult = false;
+    var cooldownEndTime = 0;
+    var cooldownTimer = null;
+
+    function startCooldown(seconds) {
+      cooldownEndTime = Date.now() + seconds * 1000;
+      updateCooldownDisplay();
+      if (cooldownTimer) clearInterval(cooldownTimer);
+      cooldownTimer = setInterval(function() {
+        if (Date.now() >= cooldownEndTime) {
+          clearInterval(cooldownTimer);
+          cooldownTimer = null;
+          cooldownEndTime = 0;
+          updateSearchButton();
+        } else {
+          updateCooldownDisplay();
+        }
+      }, 1000);
+    }
+
+    function getCooldownText() {
+      var remaining = Math.max(0, Math.ceil((cooldownEndTime - Date.now()) / 1000));
+      if (remaining <= 0) return null;
+      var minutes = Math.floor(remaining / 60);
+      var seconds = remaining % 60;
+      return "Chờ " + String(minutes).padStart(2, "0") + ":" + String(seconds).padStart(2, "0");
+    }
+
+    function updateCooldownDisplay() {
+      var button = document.getElementById("searchBtn");
+      var refreshButton = document.getElementById("refreshBtn");
+      var cooldownText = getCooldownText();
+      if (cooldownText && !isScraping) {
+        button.disabled = true;
+        button.textContent = cooldownText;
+        refreshButton.disabled = true;
+        document.getElementById("statusText").textContent = "Vui lòng chờ trước khi tra cứu tiếp";
+      } else if (!isScraping) {
+        button.disabled = false;
+        button.textContent = "Tra cứu";
+        refreshButton.disabled = false;
+        document.getElementById("statusText").textContent = hasResult ? "Dữ liệu đã cập nhật" : "Hệ thống sẵn sàng";
+      }
+    }
 
     function formatVND(value) {
       var amount = Number(value);
@@ -1190,13 +1233,26 @@
     function updateSearchButton() {
       var button = document.getElementById("searchBtn");
       var refreshButton = document.getElementById("refreshBtn");
-      button.disabled = isScraping;
-      button.textContent = isScraping ? "Đang tra cứu" : "Tra cứu";
-      refreshButton.disabled = isScraping;
-      refreshButton.classList.toggle("refreshing", isScraping);
-      document.getElementById("statusText").textContent = isScraping
-        ? "Đang đồng bộ dữ liệu"
-        : hasResult ? "Dữ liệu đã cập nhật" : "Hệ thống sẵn sàng";
+      var cooldownText = getCooldownText();
+      if (isScraping) {
+        button.disabled = true;
+        button.textContent = "Đang tra cứu";
+        refreshButton.disabled = true;
+        refreshButton.classList.toggle("refreshing", true);
+        document.getElementById("statusText").textContent = "Đang đồng bộ dữ liệu";
+      } else if (cooldownText) {
+        button.disabled = true;
+        button.textContent = cooldownText;
+        refreshButton.disabled = true;
+        refreshButton.classList.toggle("refreshing", false);
+        document.getElementById("statusText").textContent = "Vui lòng chờ trước khi tra cứu tiếp";
+      } else {
+        button.disabled = false;
+        button.textContent = "Tra cứu";
+        refreshButton.disabled = false;
+        refreshButton.classList.toggle("refreshing", false);
+        document.getElementById("statusText").textContent = hasResult ? "Dữ liệu đã cập nhật" : "Hệ thống sẵn sàng";
+      }
     }
 
     function showError(message) {
@@ -1212,6 +1268,10 @@
 
     async function doScrape() {
       if (isScraping) return;
+      if (cooldownEndTime > 0 && Date.now() < cooldownEndTime) {
+        showError("Vui lòng chờ hết thời gian cooldown trước khi tra cứu tiếp.");
+        return;
+      }
 
       var urlInput = document.getElementById("urlInput");
       var hoursInput = document.getElementById("hoursInput");
@@ -1258,8 +1318,13 @@
           body: JSON.stringify({ url: url, hours: hours }),
         });
         var data = await response.json();
+        if (response.status === 429) {
+          if (data.cooldownRemaining) startCooldown(data.cooldownRemaining);
+          throw new Error(data.error || "Vui lòng chờ trước khi tra cứu tiếp.");
+        }
         if (!response.ok) throw new Error(data.error || "Không thể lấy dữ liệu từ ZyPage.");
         hasResult = true;
+        startCooldown(600); // 10 phút = 600 giây
         renderResult(data);
       } catch (error) {
         showError(error.message);
@@ -1360,6 +1425,10 @@
 
     function refreshData() {
       if (isScraping) return;
+      if (cooldownEndTime > 0 && Date.now() < cooldownEndTime) {
+        showError("Vui lòng chờ hết thời gian cooldown trước khi tra cứu tiếp.");
+        return;
+      }
       if (!document.getElementById("urlInput").value.trim()) {
         document.getElementById("urlInput").focus();
         showError("Nhập đường dẫn ZyPage để làm mới dữ liệu.");
